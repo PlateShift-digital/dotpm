@@ -1,0 +1,8 @@
+{
+	"require": {
+		"plateshift/advanced-input-map": "@master"
+	},
+	"require_dev": {
+
+	}
+}
