@@ -1,0 +1,10 @@
+# Redot 4+ specific ignores
+.godot/
+/android/
+
+# IDE related ignores
+/.idea
+
+# Dot-PM build ignores
+/export/*
+!/export/.gdignore
