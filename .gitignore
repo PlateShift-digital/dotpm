@@ -8,3 +8,6 @@
 # Dot-PM build ignores
 /export/*
 !/export/.gdignore
+
+# Dot-PM installed packages
+/addons/

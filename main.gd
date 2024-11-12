@@ -1,9 +1,7 @@
 extends Node
 
-var cwd: String = ''
-var home: String = ''
 var result_code: int = 0
-var arguments: Array = ['update']
+var arguments: Array = []
 var options: Dictionary = {}
 
 var commands: Dictionary = {
@@ -15,7 +13,7 @@ var commands: Dictionary = {
 func _ready() -> void:
 	_parse_input_args()
 
-	if not FileAccess.file_exists(cwd + '/dotpm.json'):
+	if not PackageMetaReader.package_configuration_exists():
 		printerr('dotpm.json not found in current work directory!')
 		get_tree().quit(1)
 		return
@@ -27,7 +25,7 @@ func _ready() -> void:
 		command = arguments.pop_front()
 
 		if commands.has(command):
-			command_node = commands[command].new(cwd, home)
+			command_node = commands[command].new()
 			add_child(command_node)
 
 			result_code = command_node.execute(arguments, options)
@@ -42,9 +40,6 @@ func _ready() -> void:
 	queue_free()
 
 func _parse_input_args() -> void:
-	cwd = ProjectSettings.globalize_path(DirAccess.open('.').get_current_dir(true)).replace('\\', '/')
-	home = (OS.get_environment("USERPROFILE") if OS.has_feature("windows") else OS.get_environment("HOME")).replace('\\', '/')
-
 	for input in OS.get_cmdline_args():
 		if input.begins_with('--'):
 			var equal_sep = input.find('=')
@@ -65,9 +60,9 @@ func print_help() -> void:
 
 	print('Available commands:')
 	for command_name: String in commands:
-		command_node = commands[command_name].new(cwd, home)
+		command_node = commands[command_name].new()
 		print(
 			('  ' + command_name + ': ').rpad(15),
-			commands[command_name].new(cwd, home).description()
+			command_node.description()
 		)
 		command_node.free()

@@ -14,3 +14,9 @@ config/name="dot-pm"
 run/main_scene="res://main.tscn"
 config/features=PackedStringArray("4.3", "Forward Plus")
 config/icon="res://icon.svg"
+
+[autoload]
+
+CacheHandler="*res://services/cache_handler.gd"
+PackageInstaller="*res://services/package_installer.gd"
+PackageMetaReader="*res://services/package_meta_reader.gd"
