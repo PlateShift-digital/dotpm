@@ -49,7 +49,7 @@ func _copy_directory_recursive(from: String, to: String) -> void:
 	dir.list_dir_begin()
 
 	for sub_dir: String in dir.get_directories():
-		DirAccess.make_dir_absolute(to + '/' + sub_dir)
+		DirAccess.make_dir_recursive_absolute(to + '/' + sub_dir)
 		_copy_directory_recursive(from + '/' + sub_dir, to + '/' + sub_dir)
 
 	for file: String in dir.get_files():
