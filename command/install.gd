@@ -16,10 +16,10 @@ func execute(command: Array, options: Dictionary) -> int:
 
 		return command_node.execute(command, options)
 
-	#print(OS.execute('git', ['status'], output, true))
-	#var map_file: FileAccess = FileAccess.open(cwd + '/input_map.conf', FileAccess.WRITE)
-	#map_file.store_string('wah!!')
-	#map_file.close()
+	PackageMetaReader.load_lock_file()
+	PackageMetaReader.load_installed_packages()
+	CacheHandler.build_package_cache()
+	PackageInstaller.synchronise_packages()
+	PackageMetaReader.write_installed_packages()
 
-	print_debug(command, options)
 	return 1

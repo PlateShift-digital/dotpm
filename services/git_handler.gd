@@ -1,7 +1,14 @@
 extends Node
 
 
-func clone(source: String, branch: String, target: String) -> int:
+func clone(source: String, target: String) -> int:
+	return OS.execute('git', [
+		'clone',
+		source,
+		target,
+	])
+
+func clone_branch(source: String, branch: String, target: String) -> int:
 	return OS.execute('git', [
 		'clone',
 		'--branch=' + branch,

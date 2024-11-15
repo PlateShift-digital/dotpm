@@ -3,7 +3,6 @@ extends Node
 var work_dir: String
 
 var requirements: Dictionary = {}
-var lock: Dictionary = {}
 var installed: Dictionary = {}
 var installed_changed: bool = false
 
@@ -19,7 +18,7 @@ func load_project_data() -> void:
 			requirements[package] = PackageMetaReader.get_requested_project_data(package, project_config.require[package])
 
 func load_lock_file() -> void:
-	if not FileAccess.file_exists(work_dir + '/dotpm.lock'):
+	if not FileAccess.file_exists(work_dir + '/dotpm-lock.json'):
 		return
 
 	# TODO: load and parse lock file
@@ -48,13 +47,21 @@ func write_installed_packages() -> void:
 	file.store_string(JSON.stringify(installed, "\t"))
 	file.close()
 
+func write_lock_file() -> void:
+	var file: FileAccess = FileAccess.open(work_dir + '/dotpm-lock.json', FileAccess.WRITE)
+	file.store_string(JSON.stringify(installed, "\t"))
+	file.close()
+
 func get_package_diff() -> Array[String]:
 	var diff: Array[String] = []
 	var cache: PackageCache
 
 	for package in requirements:
 		cache = requirements[package]
+		print_debug(cache.install_type)
 		if cache.install_type == 'clone':
+			print_debug(cache.cache_version)
+			print_debug(installed[package].version.installed)
 			if not installed.has(package):
 				diff.append(package)
 			elif installed.has(package) and cache.cache_version != installed[package].version.installed:
@@ -69,7 +76,7 @@ func package_configuration_exists() -> bool:
 	return FileAccess.file_exists(work_dir + '/dotpm.json')
 
 func package_lock_exists() -> bool:
-	return FileAccess.file_exists(work_dir + '/dotpm.lock')
+	return FileAccess.file_exists(work_dir + '/dotpm-lock.json')
 
 func get_requested_project_data(project: String, version: String) -> PackageCache:
 	#TODO: implement a solution to load package data
@@ -78,7 +85,7 @@ func get_requested_project_data(project: String, version: String) -> PackageCach
 			project,
 			{
 				'code_source': 'https://github.com/PlateShift-digital/advanced-input-map.git',
-				'install_type': 'clone' if version.begins_with('@') else '-not-implemented-',
+				'install_type': 'clone' if version.begins_with('@') or version.begins_with('#') else '-not-implemented-',
 				'package_target': 'addons/advanced_input_map',
 				'package_source': 'addons/advanced_input_map',
 				'versions': {}

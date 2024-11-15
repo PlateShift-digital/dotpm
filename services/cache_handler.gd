@@ -18,7 +18,9 @@ func build_package_cache() -> void:
 
 		if request_data.request_version.begins_with('@'):
 			CacheHandler.clone_into_cache(cache_target, request_data)
-		elif request_data.data.versions.has(request_data.request_version):
+		elif request_data.request_version.begins_with('#'):
+			CacheHandler.clone_into_cache(cache_target, request_data)
+		elif request_data.versions.has(request_data.request_version):
 			print_debug('it has the version')
 		else: # try to clone it directly as the version is unknown
 			print_debug('version unknown, trying to clone it directly')
@@ -44,14 +46,17 @@ func clone_into_cache(cache_target: String, request_data: PackageCache) -> void:
 	cache_target = cache_target + '/clone'
 	var command_options: Array
 
-	print_debug(cache_target)
 	if DirAccess.dir_exists_absolute(cache_target):
 		# fetch from origin, checkout branch and pull to make sure updates arrived
 		GitHandler.execute(cache_target, ['fetch', 'origin', '-p'])
 		GitHandler.execute(cache_target, ['checkout', request_data.request_version.substr(1)])
-		#GitHandler.execute(cache_target, ['pull'])
-	else:
+		GitHandler.execute(cache_target, ['pull'])
+	elif request_data.request_version.begins_with('@'):
 		# cloning branch directly
-		GitHandler.clone(request_data.code_source, request_data.request_version.substr(1), cache_target)
+		GitHandler.clone_branch(request_data.code_source, request_data.request_version.substr(1), cache_target)
+	elif request_data.request_version.begins_with('#'):
+		# cloning repository and checking out commit
+		GitHandler.clone(request_data.code_source, cache_target)
+		GitHandler.execute(cache_target, ['checkout', request_data.request_version.substr(1)])
 
 	request_data.set_cache_version(GitHandler.execute_with_result(cache_target, ['rev-parse', 'HEAD']).trim_suffix('\n'))
