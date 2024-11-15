@@ -12,5 +12,6 @@ func execute(_command: Array, _options: Dictionary) -> int:
 	CacheHandler.build_package_cache()
 	PackageInstaller.synchronise_packages()
 	PackageMetaReader.write_installed_packages()
+	PackageMetaReader.write_lock_file()
 
 	return 1

@@ -10,19 +10,25 @@ func _init() -> void:
 	if OS.get_environment('DOTPM_CACHE_DIR'):
 		cache_dir = OS.get_environment('DOTPM_CACHE_DIR')
 	else:
-		var home_dir = (OS.get_environment("USERPROFILE") if OS.has_feature("windows") else OS.get_environment("HOME")).replace('\\', '/')
+		var home_dir: String = (OS.get_environment("USERPROFILE") if OS.has_feature("windows") else OS.get_environment("HOME")).replace('\\', '/')
 		cache_dir = home_dir + '/.dotpm/cache'
 
 func synchronise_packages() -> void:
-	var access = DirAccess.open(work_dir)
+	var access: DirAccess = DirAccess.open(work_dir)
 	if not access.dir_exists('addons'):
 		access.make_dir('addons')
 
 	var cache: PackageCache
 	var diff: Array[String] = PackageMetaReader.get_package_diff()
-	for package_name in diff:
-		cache = _synchronise_package(package_name)
-		PackageMetaReader.set_installed_package(package_name, cache)
+
+	if diff.size() > 0:
+		print('change detected. ' + str(diff.size()) + ' packages will be updated or installed...')
+
+		for package_name in diff:
+			cache = _synchronise_package(package_name)
+			PackageMetaReader.set_installed_package(package_name, cache)
+	else:
+		print('nothing to install or update. you are up to date!')
 
 func _synchronise_package(package_name: String) -> PackageCache:
 	var source_dir: String
@@ -33,6 +39,13 @@ func _synchronise_package(package_name: String) -> PackageCache:
 
 	if cache.install_type == 'clone':
 		source_dir = cache.cache_dir + '/clone/' + cache.package_source
+
+		if PackageMetaReader.installed.has(package_name):
+			print('  updating package ' + package_name + ' (' + PackageMetaReader.installed[package_name].version.installed.substr(0, 8) + ' -> ' + cache.cache_version.substr(0, 8) + ')')
+		else:
+			print('  installing package ' + package_name + ' (' + cache.cache_version.substr(0, 8) + ')')
+
+
 		_delete_directory_recursive(target_dir)
 		_copy_directory_recursive(source_dir, target_dir)
 

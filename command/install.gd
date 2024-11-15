@@ -17,6 +17,12 @@ func execute(command: Array, options: Dictionary) -> int:
 		return command_node.execute(command, options)
 
 	PackageMetaReader.load_lock_file()
+
+	if ERR_FILE_CORRUPT == PackageMetaReader.validate_lock_hash():
+		print('lock file is not in sync with changes from dotpm.json!')
+		print('run the update command to fix this warning.')
+		print('')
+
 	PackageMetaReader.load_installed_packages()
 	CacheHandler.build_package_cache()
 	PackageInstaller.synchronise_packages()

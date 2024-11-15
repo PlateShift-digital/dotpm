@@ -1,8 +1,5 @@
 {
 	"require": {
-		"plateshift/advanced-input-map": "#c264c9d4013a3c68dcad7e8b4a9d665c9695b355"
-	},
-	"require_dev": {
-
+		"plateshift/advanced-input-map": "@master"
 	}
 }
