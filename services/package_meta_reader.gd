@@ -5,6 +5,7 @@ var work_dir: String
 var requirements: Dictionary = {}
 var lock: Dictionary = {}
 var installed: Dictionary = {}
+var installed_changed: bool = false
 
 
 func _init() -> void:
@@ -14,11 +15,8 @@ func load_project_data() -> void:
 	var project_config: Dictionary = JSON.parse_string(FileAccess.get_file_as_string(work_dir + '/dotpm.json'))
 
 	if project_config.has('require'):
-		for project: String in project_config.require:
-			requirements[project] = {
-				'data': PackageMetaReader.get_requested_project_data(project),
-				'requested': project_config.require[project],
-			}
+		for package: String in project_config.require:
+			requirements[package] = PackageMetaReader.get_requested_project_data(package, project_config.require[package])
 
 func load_lock_file() -> void:
 	if not FileAccess.file_exists(work_dir + '/dotpm.lock'):
@@ -32,23 +30,38 @@ func load_installed_packages() -> void:
 
 	installed = JSON.parse_string(FileAccess.get_file_as_string(work_dir + '/addons/installed.json'))
 
-func set_installed_package(package_name: String, package_meta: Dictionary) -> void:
-	pass
+func set_installed_package(package_name: String, package_cache: PackageCache) -> void:
+	installed_changed = true
+	installed[package_name] = {
+		'type': package_cache.install_type,
+		'version': {
+			'requested': package_cache.request_version,
+			'installed': package_cache.cache_version,
+		}
+	}
 
 func write_installed_packages() -> void:
+	if not installed_changed:
+		return
+
 	var file: FileAccess = FileAccess.open(work_dir + '/addons/installed.json', FileAccess.WRITE)
 	file.store_string(JSON.stringify(installed, "\t"))
 	file.close()
 
-func get_package_diff() -> Dictionary:
-	var diff: Dictionary = {}
+func get_package_diff() -> Array[String]:
+	var diff: Array[String] = []
+	var cache: PackageCache
 
 	for package in requirements:
-		if not installed.has(package):
-			diff[package] = {
-				'source': requirements[package],
-				'installed': null,
-			}
+		cache = requirements[package]
+		if cache.install_type == 'clone':
+			if not installed.has(package):
+				diff.append(package)
+			elif installed.has(package) and cache.cache_version != installed[package].version.installed:
+				diff.append(package)
+		else:
+			#TODO: implement non-source installation
+			pass
 
 	return diff
 
@@ -58,19 +71,21 @@ func package_configuration_exists() -> bool:
 func package_lock_exists() -> bool:
 	return FileAccess.file_exists(work_dir + '/dotpm.lock')
 
-func get_requested_project_data(project: String) -> Dictionary:
+func get_requested_project_data(project: String, version: String) -> PackageCache:
+	#TODO: implement a solution to load package data
 	if project == 'plateshift/advanced-input-map':
-		return {
-			'code_source': 'https://github.com/PlateShift-digital/advanced-input-map.git',
-			'type': 'clone',
-			'target': 'addons/advanced_input_map',
-			'source': 'addons/advanced_input_map',
-			'versions': {
-				#'@master': {
-					#'type': 'clone',
-					#'branch': 'master',
-				#},
+		var cache: PackageCache = CacheHandler.resolve_package_cache(
+			project,
+			{
+				'code_source': 'https://github.com/PlateShift-digital/advanced-input-map.git',
+				'install_type': 'clone' if version.begins_with('@') else '-not-implemented-',
+				'package_target': 'addons/advanced_input_map',
+				'package_source': 'addons/advanced_input_map',
+				'versions': {}
 			}
-		}
+		)
+		cache.set_requesed_version(version)
 
-	return {}
+		return cache
+
+	return null

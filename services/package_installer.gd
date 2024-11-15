@@ -18,25 +18,30 @@ func synchronise_packages() -> void:
 	if not access.dir_exists('addons'):
 		access.make_dir('addons')
 
-	var diff: Dictionary = PackageMetaReader.get_package_diff()
+	var cache: PackageCache
+	var diff: Array[String] = PackageMetaReader.get_package_diff()
 	for package_name in diff:
-		_synchronise_package(package_name, diff[package_name].source, diff[package_name].installed)
-		PackageMetaReader.set_installed_package(package_name, diff[package_name].source)
+		cache = _synchronise_package(package_name)
+		PackageMetaReader.set_installed_package(package_name, cache)
 
-func _synchronise_package(package_name: String, source_meta, installed_meta) -> void:
-	var source_dir: String = cache_dir + '/' + package_name + '/clone/' + source_meta.data.source
-	var target_dir: String = work_dir + '/' + source_meta.data.target
+func _synchronise_package(package_name: String) -> PackageCache:
+	var source_dir: String
+	var cache: PackageCache = CacheHandler.get_package_cache(package_name)
+	var target_dir: String = work_dir + '/' + cache.package_target
 
 	DirAccess.make_dir_recursive_absolute(target_dir)
 
-	if source_meta.data.type == 'clone':
+	if cache.install_type == 'clone':
+		source_dir = cache.cache_dir + '/clone/' + cache.package_source
 		_delete_directory_recursive(target_dir)
 		_copy_directory_recursive(source_dir, target_dir)
-	# TODO: sync package
-	pass
+
+		return cache
+
+	return null
 
 func _remove_package(package_dir: String) -> void:
-	pass
+	_delete_directory_recursive(package_dir)
 
 func _install_package(source_meta: Dictionary, target: String) -> void:
 	pass
