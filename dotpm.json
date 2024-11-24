@@ -1,5 +1,5 @@
 {
 	"require": {
-		"plateshift/advanced-input-map": "@master"
+		"https://github.com/PlateShift-digital/advanced-input-map.git": "@master"
 	}
 }

@@ -1,6 +1,6 @@
 {
-	"hash": "d41d8cd98f00b204e9800998ecf8427e",
+	"hash": "43076b09ee2739758ebf7c2b3617b1a7",
 	"require": {
-		"plateshift/advanced-input-map": "#7e804ee6b1a80f978bbdaf132ca7c42ab47274b1"
+		"https://github.com/PlateShift-digital/advanced-input-map.git": "#b9daa799d9896b48186a4453e7b17b664b440ebe"
 	}
 }

@@ -33,6 +33,9 @@ func synchronise_packages() -> void:
 func _synchronise_package(package_name: String) -> PackageCache:
 	var source_dir: String
 	var cache: PackageCache = CacheHandler.get_package_cache(package_name)
+	if not cache.package_target or cache.package_target.length() == 0:
+		return null
+
 	var target_dir: String = work_dir + '/' + cache.package_target
 
 	DirAccess.make_dir_recursive_absolute(target_dir)
