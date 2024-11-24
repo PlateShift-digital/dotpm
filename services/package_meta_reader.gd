@@ -51,6 +51,10 @@ func set_installed_package(package_name: String, package_cache: PackageCache) ->
 		}
 	}
 
+func remove_installed_package(package_name: String) -> void:
+	installed_changed = true
+	installed.erase(package_name)
+
 func write_installed_packages() -> void:
 	if not installed_changed:
 		return
@@ -83,10 +87,12 @@ func write_lock_file() -> void:
 func get_package_diff() -> Array[String]:
 	var diff: Array[String] = []
 	var cache: PackageCache
+	var detected: Array[String] = []
 
 	for package: String in requirements:
 		cache = requirements[package]
 		if cache.install_type == 'clone':
+			detected.append(package)
 			if not installed.has(package):
 				diff.append(package)
 			elif installed.has(package) and cache.cache_version != installed[package].version.installed:
@@ -94,6 +100,9 @@ func get_package_diff() -> Array[String]:
 		else:
 			#TODO: implement non-source installation
 			pass
+	for package: String in installed:
+		if not detected.has(package):
+			diff.append(package)
 
 	return diff
 
