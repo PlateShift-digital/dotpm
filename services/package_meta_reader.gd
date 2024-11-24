@@ -22,8 +22,8 @@ func load_lock_file() -> void:
 	if not FileAccess.file_exists(work_dir + '/dotpm-lock.json'):
 		return
 
-	lock_hash = FileAccess.get_file_as_string(work_dir + '/dotpm.json').md5_text()
 	var lock_content: Dictionary = JSON.parse_string(FileAccess.get_file_as_string(work_dir + '/dotpm-lock.json'))
+	lock_hash = lock_content.hash
 
 	for package: String in lock_content.require:
 		requirements[package] = PackageMetaReader.get_requested_project_data(package, lock_content.require[package])

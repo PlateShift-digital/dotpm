@@ -63,6 +63,8 @@ func clone_into_cache(request_data: PackageCache) -> void:
 
 	if FileAccess.file_exists(cache_target + '/dotpm.json'):
 		apply_dotpm_configuration(cache_target + '/dotpm.json', request_data)
+	else:
+		generate_dotpm_configuration(cache_target, request_data)
 
 	request_data.set_cache_version(GitHandler.execute_with_result(cache_target, ['rev-parse', 'HEAD']).trim_suffix('\n'))
 
@@ -75,3 +77,9 @@ func apply_dotpm_configuration(config_path: String, package_cache: PackageCache)
 			package_cache.package_source = config.package_source
 		if config.has('package_target'):
 			package_cache.package_target = config.package_target
+
+func generate_dotpm_configuration(cache_path: String, package_cache: PackageCache) -> void:
+	#TODO: check if addons exists, check if only one exists (abort if multiple)
+	#TODO: enable marking cache as corrupt (preventing installation)
+	if not DirAccess.dir_exists_absolute(cache_path + '/addons'):
+		return

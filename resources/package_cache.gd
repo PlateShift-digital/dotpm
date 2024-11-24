@@ -11,7 +11,6 @@ var versions: Array[PackageVersion] = []
 var cache_version: String
 var request_version: String
 
-
 func _init(package_name: String, data: Dictionary) -> void:
 	name = package_name
 	cache_dir = CacheHandler.cache_dir + '/' + package_name
@@ -33,3 +32,9 @@ func set_cache_version(version: String) -> void:
 
 func set_requesed_version(version: String) -> void:
 	request_version = version
+
+func is_installable() -> bool:
+	if not package_target or not package_source:
+		return false
+
+	return true

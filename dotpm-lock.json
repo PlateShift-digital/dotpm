@@ -1,6 +1,7 @@
 {
-	"hash": "43076b09ee2739758ebf7c2b3617b1a7",
+	"hash": "bcff379abcebe02ceb6daeaeec44fb13",
 	"require": {
-		"https://github.com/PlateShift-digital/advanced-input-map.git": "#b9daa799d9896b48186a4453e7b17b664b440ebe"
+		"https://github.com/PlateShift-digital/advanced-input-map.git": "#b9daa799d9896b48186a4453e7b17b664b440ebe",
+		"https://github.com/viniciusgerevini/godot-aseprite-wizard.git": "#1dc9a1ef0b3c2112d5ac26eec8e1f5197ec83eb1"
 	}
 }

@@ -26,7 +26,8 @@ func synchronise_packages() -> void:
 
 		for package_name in diff:
 			cache = _synchronise_package(package_name)
-			PackageMetaReader.set_installed_package(package_name, cache)
+			if cache:
+				PackageMetaReader.set_installed_package(package_name, cache)
 	else:
 		print('nothing to install or update. you are up to date!')
 
@@ -34,6 +35,10 @@ func _synchronise_package(package_name: String) -> PackageCache:
 	var source_dir: String
 	var cache: PackageCache = CacheHandler.get_package_cache(package_name)
 	if not cache.package_target or cache.package_target.length() == 0:
+		return null
+
+	if not cache.is_installable():
+		print('  unable to install package ' + package_name)
 		return null
 
 	var target_dir: String = work_dir + '/' + cache.package_target
