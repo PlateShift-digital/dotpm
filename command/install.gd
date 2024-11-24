@@ -1,6 +1,6 @@
 extends BaseCommand
 
-var update_command: GDScript = preload('res://command/update.gd')
+const UPDATE_COMMAND: GDScript = preload('res://command/update.gd')
 
 
 func description() -> String:
@@ -10,7 +10,7 @@ func execute(command: Array, options: Dictionary) -> int:
 	if not PackageMetaReader.package_lock_exists():
 		print('lock file does not exist... updating dependencies to generate it...')
 
-		var command_node: BaseCommand = update_command.new()
+		var command_node: BaseCommand = UPDATE_COMMAND.new()
 		get_parent().add_child(command_node)
 		queue_free()
 
