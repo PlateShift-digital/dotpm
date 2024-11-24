@@ -79,7 +79,13 @@ func apply_dotpm_configuration(config_path: String, package_cache: PackageCache)
 			package_cache.package_target = config.package_target
 
 func generate_dotpm_configuration(cache_path: String, package_cache: PackageCache) -> void:
-	#TODO: check if addons exists, check if only one exists (abort if multiple)
-	#TODO: enable marking cache as corrupt (preventing installation)
 	if not DirAccess.dir_exists_absolute(cache_path + '/addons'):
 		return
+
+	var dir: DirAccess = DirAccess.open(cache_path + '/addons')
+	dir.list_dir_begin()
+	var dir_list: Array = dir.get_directories()
+
+	if dir_list.size() == 1:
+		package_cache.package_source = 'addons/' + dir_list[0]
+		package_cache.package_target = 'addons/' + dir_list[0]
