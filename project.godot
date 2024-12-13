@@ -12,6 +12,7 @@ config_version=5
 
 config/name="dot-pm"
 run/main_scene="res://main.tscn"
+run/print_header=false
 config/features=PackedStringArray("4.3", "Forward Plus")
 config/icon="res://icon.svg"
 
